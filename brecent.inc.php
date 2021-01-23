@@ -1,5 +1,5 @@
 <?php
-// $Id: brecent.inc.php,v 1.0 2021/01/13 16:53:34 K Exp $
+// $Id: brecent.inc.php,v 1.1 2021/01/24 08:16:03 K Exp $
 
 /** 
 * @link http://pkom.ml/?プラグイン/brecent.inc.php
@@ -20,7 +20,11 @@ define('PLUGIN_BRECENT_USAGE', '#brecent(number-to-show)');
 define('PLUGIN_BRECENT_CACHE', CACHE_DIR . 'recent.dat');
 
 define('THUMB_DIR', "thumbnail/");
+
 define('PLUGIN_BRECENT_HIDE_PAGES', "RecentDeleted,InterWikiName,AutoAliasName,RecentChanges");
+
+define('PLUGIN_BRECENT_PAGESPEEDONLINE_API', "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?screenshot=true&strategy=desktop&url=%URL%");
+
 function plugin_brecent_convert()
 {
 	global $vars, $date_format, $head_tags, $plugin_blogplug;
@@ -212,10 +216,13 @@ function plugin_brecent_action(){
         $body = <<<EOD
         <h2>「{$vars['page']}」のサムネイルの添付</h2>
         <form method="post" enctype="multipart/form-data" action="./">
-            <input type="hidden" name="plugin" value="brecent">
-            <input type="hidden" name="do" value="upload">
-            <input type="hidden" name="page" value="{$vars['page']}">
-            サムネイル:<input type="file" name="uploadfile"><br /><br />
+            <input type="hidden" name="plugin" value="brecent" />
+            <input type="hidden" name="do" value="upload" />
+            <input type="hidden" name="page" value="{$vars['page']}" />
+            <input type="radio" name="select_mode" id="select_mode1" value="upload" checked /><label for="select_mode1">サムネイル画像:<input type="file" name="uploadfile" id="uploadfile" /></label>
+            <br />
+            <input type="radio" name="select_mode" id="select_mode2" value="screenshot" /><label for="select_mode2">ページ・サイトのスクリーンショットを生成してサムネイルにする。</label>
+            <br /><br />
             管理者パスワード:<input type="password" name="adminpass">&nbsp;
             <input type="submit" value="アップロード" />
         </form>
@@ -225,10 +232,13 @@ function plugin_brecent_action(){
             $body = <<<EOD
             <h2>ログインに失敗しました。</h2>
             <form method="post" enctype="multipart/form-data" action="./">
-                <input type="hidden" name="plugin" value="brecent">
-                <input type="hidden" name="do" value="upload">
-                <input type="hidden" name="page" value="{$vars['page']}">
-                サムネイル:<input type="file" name="uploadfile"><br /><br />
+                <input type="hidden" name="plugin" value="brecent" />
+                <input type="hidden" name="do" value="upload" />
+                <input type="hidden" name="page" value="{$vars['page']}" />
+                <input type="radio" name="select_mode" id="select_mode1" value="upload" checked /><label for="select_mode1">サムネイル画像:<input type="file" name="uploadfile" id="uploadfile" /></label>
+                <br />
+                <input type="radio" name="select_mode" id="select_mode2" value="screenshot" /><label for="select_mode2">ページ・サイトのスクリーンショットを生成してサムネイルにする。</label>
+                <br /><br />
                 管理者パスワード:<input type="password" name="adminpass">&nbsp;
                 <input type="submit" value="アップロード" />
             </form>
@@ -238,15 +248,37 @@ function plugin_brecent_action(){
         if(!file_exists(THUMB_DIR)){
             mkdir(THUMB_DIR);
         }
-        if(is_uploaded_file($_FILES["uploadfile"]["tmp_name"])){
-            $pathinfo = pathinfo($_FILES["uploadfile"]["name"]);
-            if(strtolower($pathinfo["extension"]) == "png"){
-                move_uploaded_file($_FILES["uploadfile"]["tmp_name"], THUMB_DIR . strtoupper(bin2hex($vars['page'])) . ".png");
-            }else{
-                $image = @imagecreatefrompng($_FILES["uploadfile"]["tmp_name"]);
-                imagepng($image, THUMB_DIR . strtoupper(bin2hex($vars['page'])) . ".png");
-                imagedestroy($image);
+        if($vars['select_mode'] == "upload"){
+            if(is_uploaded_file($_FILES["uploadfile"]["tmp_name"])){
+                $pathinfo = pathinfo($_FILES["uploadfile"]["name"]);
+                if(strtolower($pathinfo["extension"]) == "png"){
+                    move_uploaded_file($_FILES["uploadfile"]["tmp_name"], THUMB_DIR . strtoupper(bin2hex($vars['page'])) . ".png");
+                }else{
+                    $image = @imagecreatefromstring(file_get_contents($_FILES["uploadfile"]["tmp_name"]));
+                    imagepng($image, THUMB_DIR . strtoupper(bin2hex($vars['page'])) . ".png");
+                    imagedestroy($image);
+                }
             }
+        }elseif($vars['select_mode'] == "screenshot"){
+            if(preg_match("/https?:\/{2}.*/u", $vars['page'])){
+                $pageurl = $vars['page'];
+            }else{
+                $pageurl = get_script_uri() . "?" . $vars['page'];
+            }
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, str_replace("%URL%", $pageurl, PLUGIN_BRECENT_PAGESPEEDONLINE_API));
+            curl_setopt($curl, CURLOPT_HEADER, false);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 300);
+            $jsonsource = curl_exec($curl);
+            curl_close($curl);
+            $json_array = json_decode($jsonsource, true);
+            $base64image = $json_array['lighthouseResult']['audits']['final-screenshot']['details']['data'];
+            $base64image = preg_replace('/data:image\/(jpeg|png);base64,/', '', $base64image);
+            $imagedata = base64_decode($base64image);
+            $image = @imagecreatefromstring($imagedata);
+            imagepng($image, THUMB_DIR . strtoupper(bin2hex($vars['page'])) . ".png");
+            imagedestroy($image);
         }
     }
     return array('body' => $body, 'msg' => $msg);
