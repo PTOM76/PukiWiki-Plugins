@@ -1,5 +1,5 @@
 <?php
-// $Id: accordion.inc.php,v 1.4 2021/07/06 00:00:00 K Exp $
+// $Id: accordion.inc.php,v 1.5 2021/07/06 00:00:00 K Exp $
 
 /** 
 * @link http://pkom.ml/?%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3/accordion.inc.php
@@ -8,6 +8,7 @@
 */
 
 // region.inc.php(author:xxxxx) https://pukiwiki.osdn.jp/?%E8%87%AA%E4%BD%9C%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3/region.inc.php
+// 七海改修版参考 https://nanami.cute.bz/download/accordion.inc.zip
 
 //-Accordionプラグインの定義
 
@@ -20,17 +21,20 @@ define('PLUGIN_ACCORDION_COMPATIBILITY_STYLE', false);
 // スタイルシートの定義
 define('PLUGIN_ACCORDION_STYLE', 
 <<<EOD
-#acd_btn {
+.acd_btn {
 	cursor:pointer;
 }
-#acd_btn span {
+.acd_btn span {
 	cursor:pointer;
 	font-family: "ＭＳ Ｐゴシック", "MS PGothic", "ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro", Osaka, arial, verdana, sans-serif;
 	padding:1px 4px;
 	border:gray 1px solid;
 	color:gray;
-}
 EOD);
+
+// false→table,display:inline
+// true→div,display:block
+define('PLUGIN_ACCORDION_DISPLAY', true);
 
 function plugin_accordion_convert() {
 	static $builder = 0;
@@ -57,7 +61,7 @@ function plugin_accordion_convert() {
 	$contents = explode("\n", $contents);
 	return $builder -> build()
 	.convert_html($contents)
-	.'</td></tr></table>';
+	.(PLUGIN_ACCORDION_DISPLAY ? '</div>' : '</td></tr></table>');
 }
 
 class AccordionPlugin {
@@ -66,6 +70,7 @@ class AccordionPlugin {
 	private $isOpened;
 	private $scriptVarName;
 	private $callCount;
+	private $display;
 	
 	public function __construct() {
 		$this -> callCount = 0;
@@ -76,6 +81,7 @@ class AccordionPlugin {
 		$this -> description = "...";
 		$this -> heading = "h2";
 		$this -> isOpened = false;
+		$this -> display = PLUGIN_ACCORDION_DISPLAY ? $display = "block" : $display = "inline";
 	}
 
 	public function setClosed() { $this -> isOpened = false; }
@@ -88,10 +94,10 @@ class AccordionPlugin {
 	}
 
 	public function setHeading($heading) {
-		if (($heading == "1" ) || ( $heading == "*")) $this -> heading = "h2";
-		if (($heading == "2" ) || ( $heading == "**")) $this -> heading = "h3";
-		if (($heading == "3" ) || ( $heading == "***")) $this -> heading = "h4";
-		if (($heading == "4" ) || ( $heading == "****")) $this -> heading = "h5";
+		if ($heading == "1" || !(strcmp($heading,"*"))) $this -> heading = "h2";
+		if ($heading == "2" || !(strcmp($heading,"**"))) $this -> heading = "h3";
+		if ($heading == "3" || !(strcmp($heading,"***"))) $this -> heading = "h4";
+		if ($heading == "4" || !(strcmp($heading,"****"))) $this -> heading = "h5";
 	}
 
 	public function build() {
@@ -113,11 +119,10 @@ class AccordionPlugin {
 
 	private function buildButtonHtml() {
 		$button = ($this -> isOpened) ? "-" : "+";
-		
 		$onClick = <<<EOD
 		onclick="
-		if(document.getElementById('acd_content{$this -> callCount}').style.display!='inline'){
-			document.getElementById('acd_content{$this -> callCount}').style.display='inline';
+		if(document.getElementById('acd_content{$this -> callCount}').style.display!='{$this -> display}'){
+			document.getElementById('acd_content{$this -> callCount}').style.display='{$this -> display}';
 			document.getElementById('acd_button{$this -> callCount}').innerHTML='-';
 		}else{
 			document.getElementById('acd_content{$this -> callCount}').style.display='none';
@@ -134,18 +139,20 @@ class AccordionPlugin {
 			$onSpanClick = $onClick;
 			EOD;
 		}
+		$startTag = PLUGIN_ACCORDION_DISPLAY ? "" : "<table><tr>";
 		return <<<EOD
-		<{$this -> heading} id="acd_btn" $onHeaderClick>
+		<{$this -> heading} class="acd_btn" $onHeaderClick>
 			<span id=acd_button{$this -> callCount} $onSpanClick>$button</span>&nbsp;{$this -> description}
 		</{$this -> heading}>
-		<table><tr>
+		{$startTag}
 		EOD;
 	}
 
 	private function buildContentHtml() {
-		$contentStyle = ($this -> isOpened) ? "display:inline;" : "display:none;";
+		$startTag = PLUGIN_ACCORDION_DISPLAY ? "div" : "td";
+		$contentStyle = ($this -> isOpened) ? "display:{$this -> display};" : "display:none;";
 		return <<<EOD
-		<td id=acd_content{$this -> callCount} style="{$contentStyle}">
+		<{$startTag} id=acd_content{$this -> callCount} style="{$contentStyle}">
 		EOD;
 	}
 }
