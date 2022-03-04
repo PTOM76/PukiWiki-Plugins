@@ -23,7 +23,7 @@ define('PLUGIN_BOT_NAMES', array(
 // パーミッションはplugin_bot_define_permissions関数を参照してください
 plugin_bot_define_permissions();
 define('PLUGIN_BOT_PERMISSIONS', array(
-	"DEFAULT" => BOT_PERMISSION_ALL,
+	"DEFAULT" => BOT_PERMISSION_NONE,
 	"MDhEOTQ2MjE4NjJDRjAwRjdGNzhCNDlEQTgxN0RBMzk" => BOT_PERMISSION_PAGE_READ | BOT_PERMISSION_PAGE_LIST,
 ));
 
