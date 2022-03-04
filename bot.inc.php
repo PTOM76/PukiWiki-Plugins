@@ -1,5 +1,5 @@
 <?php
-// $Id: bot.inc.php,v 1.4 2022/03/03 00:00:00 Pitqn Exp $
+// $Id: bot.inc.php,v 1.0 2022/03/04 00:00:00 Pitqn Exp $
 
 /** 
 * @link https://pkom.ml/?プラグイン/bot.inc.php
