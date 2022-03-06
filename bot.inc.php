@@ -1,5 +1,5 @@
 <?php
-// $Id: bot.inc.php,v 1.0 2022/03/04 00:00:00 Pitqn Exp $
+// $Id: bot.inc.php,v 1.3 2022/03/06 13:59:00 Pitqn Exp $
 
 /** 
 * @link https://pkom.ml/?プラグイン/bot.inc.php
@@ -23,8 +23,8 @@ define('PLUGIN_BOT_NAMES', array(
 // パーミッションはplugin_bot_define_permissions関数を参照してください
 plugin_bot_define_permissions();
 define('PLUGIN_BOT_PERMISSIONS', array(
-	"DEFAULT" => BOT_PERMISSION_NONE,
-	"MDhEOTQ2MjE4NjJDRjAwRjdGNzhCNDlEQTgxN0RBMzk" => BOT_PERMISSION_PAGE_READ | BOT_PERMISSION_PAGE_LIST,
+	"DEFAULT" => BOT_PERMISSION_DEFAULT,
+	"MDhEOTQ2MjE4NjJDRjAwRjdGNzhCNDlEQTgxN0RBMzk" => BOT_PERMISSION_DEFAULT | BOT_PERMISSION_PAGE_EDIT,
 ));
 
 
@@ -89,9 +89,15 @@ class PluginBot_Bot {
 	
 	function proc() {
 		global $vars;
-		if (isset($vars['method']))
-			$_METHOD = strtoupper($vars['method']);
+		if (isset($_SERVER['REQUEST_METHOD']))
+			$_METHOD = strtoupper($_SERVER['REQUEST_METHOD']);
 		
+		if ($_METHOD == "PUT" || $_METHOD == "DELETE") {
+			$param = array();
+			parse_str(file_get_contents('php://input'), $param);
+			$vars = array_merge($vars, $param);
+		}
+				
 		if ($_GET['api'] == "permission") {
 			PluginBot::sendJson(array(
 				"permission" => PLUGIN_BOT_PERMISSIONS[$this->token],
@@ -198,13 +204,13 @@ class PluginBot_Bot {
 			
 			if (!exist_plugin($name))
 				PluginBot::showError("the plugin do not exist", 500, "NOT_EXIST_PLUGIN");			
-			if ($vars['type'] == "action") {
+			if ($vars['plugin_type'] == "action") {
 				if (exist_plugin_action($name)) {
 					do_plugin_action($name);
 					PluginBot::showError("executed action function", 201, "PLUGIN_EXECUTED");
 				}
 			}
-			if ($vars['type'] == "convert") {
+			if ($vars['plugin_type'] == "convert") {
 				if (exist_plugin_convert($name)) {
 					if (isset($args))
 						do_plugin_convert($name, $args);
@@ -214,7 +220,7 @@ class PluginBot_Bot {
 					PluginBot::showError("executed convert function", 201, "PLUGIN_EXECUTED");
 				}
 			}
-			if ($vars['type'] == "inline") {
+			if ($vars['plugin_type'] == "inline") {
 				if (exist_plugin_inline($name)) {
 					if (isset($args))
 						do_plugin_inline($name, $args);
@@ -232,8 +238,10 @@ class PluginBot_Bot {
 			if (BOT_PERMISSION_PLUGIN_LIST & ~PLUGIN_BOT_PERMISSIONS[$this->token]) {
 				PluginBot::showError("bot has not permission 'BOT_PERMISSION_PLUGIN_LIST'", 403, "HAS_NOT_" . "BOT_PERMISSION_PLUGIN_LIST");
 			}
-						
-			$pluginlist = glob(PLUGIN_DIR . '*.inc.php');
+			
+			$pluginlist = array_map(function($filename) {
+				return substr($filename, 0, -8); // inc.phpを取り除く
+			}, array_map('basename', glob(PLUGIN_DIR . '*.inc.php')));
 			PluginBot::sendJson($pluginlist);
 		}
 		
@@ -544,5 +552,9 @@ function plugin_bot_define_permissions() {
 	
 	// すべてのパーミッション
 	define("BOT_PERMISSION_ALL", BOT_PERMISSION_INFO | BOT_PERMISSION_PAGE_ALL | BOT_PERMISSION_PLUGIN_ALL | BOT_PERMISSION_ATTACH_ALL | BOT_PERMISSION_BACKUP_ALL | BOT_PERMISSION_DIFF_ALL | BOT_PERMISSION_TOTAL_ALL);
-
+	
+	// デフォルト用のパーミッション (書き込みと実行と検索以外はすべて)
+	define('BOT_PERMISSION_DEFAULT',BOT_PERMISSION_INFO | BOT_PERMISSION_INFO | BOT_PERMISSION_PAGE_READ | BOT_PERMISSION_PAGE_LIST | BOT_PERMISSION_PAGE_CHECK
+	 | BOT_PERMISSION_PLUGIN_LIST | BOT_PERMISSION_PLUGIN_CHECK | BOT_PERMISSION_BACKUP_READ | BOT_PERMISSION_DIFF_READ
+	 | BOT_PERMISSION_TOTAL_ALL);
 }
