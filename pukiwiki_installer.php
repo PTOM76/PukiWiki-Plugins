@@ -31,26 +31,39 @@
         echo "エラー: パスワードが設定されていません。";
     }elseif(isset($_POST['install'])){
         $url = $_POST['pkwk_url'];
+        $basename = basename($url);
         $fp = fopen($url, "r");
         if ($fp !== FALSE) {
-            file_put_contents("./" . basename($url), "");
+            file_put_contents("./" . $basename, "");
             while(!feof($fp)) {
                 $buffer = fread($fp, 4096);
                 if ($buffer !== FALSE) {
-                    file_put_contents("./" . basename($url), $buffer, FILE_APPEND);
+                    file_put_contents("./" . $basename, $buffer, FILE_APPEND);
                 }
             }
             fclose($fp);
         }
-        if(file_exists("./" . basename($url))){
+        if(file_exists("./" . $basename)){
             $zip = new ZipArchive;
-            if ($zip->open("./" . basename($url)) === TRUE) {
+            $dirname = $basename;
+            if ($zip->open("./" . $dirname) === TRUE) {
+                $dircount = 0;
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $fileinfo = $zip->statIndex($i);
+                    $filename = $fileinfo['name'];
+                    if (substr($filename, -1) === '/' && substr_count($filename, '/') === 1) {
+                        $dircount++;
+                    }
+                }
+              
+                if ($dircount) 
+                    $dirname = trim($zip->getNameIndex(0), '/');
                 $zip->extractTo('./');
                 $zip->close();
-                if(!dir_copy(pathinfo(basename($url))['filename'], __DIR__)){echo 'エラー: ディレクトリのコピーに失敗しました。もう一度試してみてください。';exit;}
-                if(!remove_dir(pathinfo(basename($url))['filename'])){echo "エラー: 解凍後のディレクトリが消えていない可能性があります。手動で削除してください。";}
+                if(!dir_copy(pathinfo($dirname)['filename'], __DIR__)){echo 'エラー: ディレクトリのコピーに失敗しました。もう一度試してみてください。';exit;}
+                if(!remove_dir(pathinfo($dirname)['filename'])) {echo "エラー: 解凍後のディレクトリが消えていない可能性があります。手動で削除してください。";}
                 if($_POST['del_tempzip'] = 'on'){
-                    unlink("./" . basename($url));
+                    unlink("./" . $basename);
                 }
                 if($_POST['del_this'] = 'on'){
                     unlink(__FILE__);
@@ -93,7 +106,7 @@
         return true;
     }
     function remove_dir($dir) {
-        $files = array_diff(scandir($dir), array('.','..'));
+        $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
             if (is_dir("$dir/$file")) {
                 remove_dir("$dir/$file");
