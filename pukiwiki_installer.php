@@ -133,7 +133,8 @@
                 PukiWiki Installerを削除する: <input type="checkbox" name="del_this" value="" checked />
                 <h3>インストール</h3>
                 バージョン: <select name="pkwk_url" size="1">
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/72656/pukiwiki-1.5.3_utf8.zip" selected>1.5.3</option>
+                    <option value="https://github.com/pukiwiki/pukiwiki/archive/2cf98c47a812b551b49500971fd75964e59a7dee.zip" selected>1.5.4</option>
+                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/72656/pukiwiki-1.5.3_utf8.zip">1.5.3</option>
                     <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/69652/pukiwiki-1.5.2_utf8.zip">1.5.2</option>
                     <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/64807/pukiwiki-1.5.1_utf8.zip">1.5.1</option>
                     <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/61634/pukiwiki-1_5_0_utf8.zip">1.5.0</option>
