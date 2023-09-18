@@ -23,7 +23,7 @@ function plugin_blink_convert()
     static $execute = 1;
     if(!$plugin_blogplug == true){
         $plugin_blogplug = true;
-$head_tags[] = "​<style>
+$head_tags[] = "<style>
 div#plugin_blinks {
     padding:0 10px 0 10px;
     margin:auto;
