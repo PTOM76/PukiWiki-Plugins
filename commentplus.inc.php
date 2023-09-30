@@ -145,17 +145,16 @@ function inputToCommentplusAreaURL(input_text1,input_text2,input_text3) {
 }
 
 </script>
-<a href="javascript:inputToCommentplusArea('&br;')">[改行]</a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&attachref();')">[添付]</a>&nbsp;
-<a href="javascript:inputToCommentplusArea2('&size(','){','};')">[サイズ]</a>&nbsp;
-<a href="javascript:inputToCommentplusAreaURL()">[URL]</a>&nbsp;
-
-<a href="javascript:inputToCommentplusArea('&smile&#59;')"><img src="./image/face/smile.png"/></a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&bigsmile&#59;')"><img src="./image/face/bigsmile.png"/></a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&huh&#59;')"><img src="./image/face/huh.png"/></a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&oh&#59;')"><img src="./image/face/oh.png"/></a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&wink&#59;')"><img src="./image/face/wink.png"/></a>&nbsp;
-<a href="javascript:inputToCommentplusArea('&sad&#59;')"><img src="./image/face/sad.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&br;')">[改行]</a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&attachref();')">[添付]</a>&nbsp;
+<a href="javascript:inputToCommentplusArea2('&size(','){','};')">[サイズ]</a>&nbsp;
+<a href="javascript:inputToCommentplusAreaURL()">[URL]</a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&smile&#59;')"><img src="./image/face/smile.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&bigsmile&#59;')"><img src="./image/face/bigsmile.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&huh&#59;')"><img src="./image/face/huh.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&oh&#59;')"><img src="./image/face/oh.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&wink&#59;')"><img src="./image/face/wink.png"/></a>&nbsp;
+<a href="javascript:inputToCommentplusArea('&sad&#59;')"><img src="./image/face/sad.png"/></a>&nbsp;
 <a href="javascript:inputToCommentplusArea('&heart&#59;')"><img src="./image/face/heart.png"/></a>&nbsp;
 EOD;
 //顔文字↑
