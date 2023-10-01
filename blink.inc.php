@@ -1,5 +1,5 @@
 <?php
-// $Id: blink.inc.php,v 1.1 2021/01/23 23:15:50 K Exp $
+// $Id: blink.inc.php,v 1.1f 2021/01/23 23:15:50 K Exp $
 
 /** 
 * @link http://pkom.ml/?プラグイン/blink.inc.php
