@@ -26,7 +26,7 @@
     <body>
         <div style="padding-left:30%;padding-right:30%;">
 <?php
-	$tooltitle = "PukiWiki Installer v1.0";
+	$tooltitle = "PukiWiki Installer v1.1";
     if(empty($_POST['v_adminpass']) && isset($_POST['install'])){
         echo "エラー: パスワードが設定されていません。";
     }elseif(isset($_POST['install'])){
@@ -146,12 +146,13 @@
                 PukiWiki Installerを削除する: <input type="checkbox" name="del_this" value="" checked />
                 <h3>インストール</h3>
                 バージョン: <select name="pkwk_url" size="1">
-                    <option value="https://github.com/pukiwiki/pukiwiki/archive/2cf98c47a812b551b49500971fd75964e59a7dee.zip" selected>1.5.4</option>
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/72656/pukiwiki-1.5.3_utf8.zip">1.5.3</option>
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/69652/pukiwiki-1.5.2_utf8.zip">1.5.2</option>
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/64807/pukiwiki-1.5.1_utf8.zip">1.5.1</option>
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/61634/pukiwiki-1_5_0_utf8.zip">1.5.0</option>
-                    <option value="https://ja.osdn.net/frs/redir.php?f=pukiwiki/12957/pukiwiki-1.4.7_notb_utf8.zip">1.4.7</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/77082/pukiwiki-1.5.4_utf8.zip" selected>1.5.4</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/72656/pukiwiki-1.5.3_utf8.zip">1.5.3</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/69652/pukiwiki-1.5.2_utf8.zip">1.5.2</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/64807/pukiwiki-1.5.1_utf8.zip">1.5.1</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/61634/pukiwiki-1_5_0_utf8.zip">1.5.0</option>
+                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/12957/pukiwiki-1.4.7_notb_utf8.zip">1.4.7</option>
+                    <option value="https://github.com/pukiwiki/pukiwiki/archive/2cf98c47a812b551b49500971fd75964e59a7dee.zip">1.5.4(Archive)</option>
                     <option value="https://web.archive.org/web/20210228080730/https://jaist.dl.osdn.jp/pukiwiki/72656/pukiwiki-1.5.3_utf8.zip">1.5.3(Archive)</option>
                 </select>
                 <br />
