@@ -57,42 +57,42 @@ function plugin_timestamp_action() {
 				check_editable($vars['page'], true, true);
 			if (PLUGIN_TIMESTAMP_CHECK_READABLE == "1")
 				check_readable($vars['page'], true, true);
-		$filename = "./wiki/" . strtoupper(bin2hex($vars['page'])) . ".txt";
-		$filetime = filemtime($filename) + (int)PLUGIN_TIMESTAMP_ADD_HOURS;
-		$y = date("Y", $filetime);
-		$m = date("m", $filetime);
-		$d = date("d", $filetime);
-		$h = date("H", $filetime);
-		$min = date("i", $filetime);
-		$s = date("s", $filetime);
-		if (PLUGIN_TIMESTAMP_UESR_ADMIN_ONLY == "1") {
-			$admin_check = "<br />管理者パスワード:<input type=\"password\" style=\"width: 100px\" name=\"plugin_timestamp_admin_password\" />";
+			$filename = "./wiki/" . strtoupper(bin2hex($vars['page'])) . ".txt";
+			$filetime = filemtime($filename) + (int)PLUGIN_TIMESTAMP_ADD_HOURS;
+			$y = date("Y", $filetime);
+			$m = date("m", $filetime);
+			$d = date("d", $filetime);
+			$h = date("H", $filetime);
+			$min = date("i", $filetime);
+			$s = date("s", $filetime);
+			if (PLUGIN_TIMESTAMP_UESR_ADMIN_ONLY == "1") {
+				$admin_check = "<br />管理者パスワード:<input type=\"password\" style=\"width: 100px\" name=\"plugin_timestamp_admin_password\" />";
+			} else {
+				$admin_check = "";
+			}
+			$body = <<<EOD
+			<h2>ページ: {$vars['page']}</h2>
+			<form action="?plugin=timestamp" method="POST">
+				<input type="text" style="width: 30px" name="plugin_timestamp_form_y" value="{$y}" />年
+				<input type="text" style="width: 15px" name="plugin_timestamp_form_m" value="{$m}" />月
+				<input type="text" style="width: 15px" name="plugin_timestamp_form_d" value="{$d}" />日
+				<input type="text" style="width: 15px" name="plugin_timestamp_form_h" value="{$h}" />時
+				<input type="text" style="width: 15px" name="plugin_timestamp_form_min" value="{$min}" />分
+				<input type="text" style="width: 15px" name="plugin_timestamp_form_s" value="{$s}" />秒
+				<input type="hidden" name="plugin_timestamp_form_page" value="{$vars['page']}" />
+				{$admin_check}
+				<input type="submit" name="plugin_timestamp_form_submit" value="変更" />
+			</form>
+			現在のページの更新日時: {$y}年{$m}月{$d}日{$h}時{$min}分{$s}秒
+EOD;
 		} else {
-			$admin_check = "";
-		}
-		$body = <<<EOD
-		<h2>ページ:{$vars['page']}</h2>
-		<form action="?plugin=timestamp" method="POST">
-			<input type="text" style="width: 30px" name="plugin_timestamp_form_y" value="{$y}" />年
-			<input type="text" style="width: 15px" name="plugin_timestamp_form_m" value="{$m}" />月
-			<input type="text" style="width: 15px" name="plugin_timestamp_form_d" value="{$d}" />日
-			<input type="text" style="width: 15px" name="plugin_timestamp_form_h" value="{$h}" />時
-			<input type="text" style="width: 15px" name="plugin_timestamp_form_min" value="{$min}" />分
-			<input type="text" style="width: 15px" name="plugin_timestamp_form_s" value="{$s}" />秒
-			<input type="hidden" name="plugin_timestamp_form_page" value="{$vars['page']}" />
-			{$admin_check}
-			<input type="submit" name="plugin_timestamp_form_submit" value="変更" />
-		</form>
-		現在のページの更新日時:{$y}年{$m}月{$d}日{$h}時{$min}分{$s}秒
-		EOD;
-		}else{
-		$body = <<<EOD
-		<h2>ページが指定されていません。</h2>
-		<br />
-		<form action="?plugin=timestamp" method="POST">
-			ページ:<input type="text" name="page" />
-			<input type="submit" name="plugin_timestamp_form_submit" value="タイムスタンプ" />
-		</form>
+			$body = <<<EOD
+			<h2>ページが指定されていません。</h2>
+			<br />
+			<form action="?plugin=timestamp" method="POST">
+				ページ: <input type="text" name="page" />
+				<input type="submit" name="plugin_timestamp_form_submit" value="タイムスタンプ" />
+			</form>
 EOD;
 		}
 	}
