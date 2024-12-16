@@ -1,23 +1,46 @@
 <?php
-// $Id: pukistatic.inc.php,v 1.0 2023/08/29 17:54:00 Pitan $
+// $Id: pukistatic.inc.php,v 1.1 2024/12/16 14:26:16 PTOM76 $
+/**
+ * PukiStatic
+ *
+ * PukiWikiを静的化します
+ * 
+ * @license MIT License
+ * @author Pitan <admin@pitan76.net>
+ * @copyright 2023-2024 Pitan
+ */
+ 
+define("PUKISTATIC_URL", ""); // 空の場合はそのまま
+
+define("PUKISTATIC_PATHES", 
+	[
+		"cmd=list",
+		"cmd=filelist",
+		"cmd=search",
+		"cmd=rss",
+	]
+);
+
 function plugin_pukistatic_action() {
-	global $defaultpage;
+	global $defaultpage, $script;
+	
+	if (!empty(PUKISTATIC_URL)) {
+		$script = PUKISTATIC_URL;
+	}
 
 	if (!file_exists("pukistatic/"))
 		mkdir("pukistatic/", 0777, true);
 	
 	$indexphp = file_get_contents("index.php");
 	$indexphp = str_replace("define('PKWK_READONLY', 1);\n", "", $indexphp);
-	$indexphp_r = str_replace("<?php", "<?php\n" . "define('PKWK_READONLY', 1);", $indexphp);
-	file_put_contents('index.php', $indexphp_r);
-	$pathes = glob("./wiki/*.txt");
+	$r_indexphp = str_replace("<?php", "<?php\n" . "define('PKWK_READONLY', 1);", $indexphp);
+	file_put_contents('index.php', $r_indexphp);
 
-	$pathes[] = "cmd=list";
-	$pathes[] = "cmd=filelist";
-	$pathes[] = "cmd=search";
+	$pathes = array_merge(glob("./wiki/*.txt"), PUKISTATIC_PATHES);
+
 	if (exist_plugin('recentupdates'))
 		$pathes[] = "plugin=recentupdates";
-	$pathes[] = "cmd=rss";
+	
 	foreach ($pathes as $path) {
 		if (substr($path, -4) == ".txt")
 			$page = hex2bin(basename($path, ".txt"));
@@ -26,10 +49,13 @@ function plugin_pukistatic_action() {
 		else 
 			$page = $path;
 		
+		$page = str_replace(' ', '+', $page);
 		$data = file_get_contents((empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/?' . $page);
+				
+		if (empty($data))
+			continue;
 		
 		$c = substr_count($page, '/') + 1;
-		
 		$root = str_repeat('../', $c);
 		
 		if ($page === $defaultpage) $root = './';
@@ -70,6 +96,7 @@ function plugin_pukistatic_action() {
 	
 	if (!file_exists("pukistatic/" . SKIN_DIR))
 		mkdir("pukistatic/" . SKIN_DIR, 0777, true);
+	
 	foreach (pukistatic_glob(SKIN_DIR . "*", ['css', 'png', 'js']) as $path) {
 		$filename = basename($path);
 		$dir = preg_replace('/'. preg_quote(SKIN_DIR, "/") . '(.*\/)' . preg_quote($filename) . '/', '$1', $path);
@@ -81,6 +108,7 @@ function plugin_pukistatic_action() {
 	
 	if (!file_exists("pukistatic/" . IMAGE_DIR))
 		mkdir("pukistatic/" . IMAGE_DIR, 0777, true);
+	
 	foreach (pukistatic_glob(IMAGE_DIR . "*", ['jpeg', 'png', 'gif', 'jpg']) as $path) {
 		$filename = basename($path);
 		$dir = preg_replace('/'. preg_quote(IMAGE_DIR, "/") . '(.*\/)' . preg_quote($filename) . '/', '$1', $path);
@@ -90,7 +118,8 @@ function plugin_pukistatic_action() {
 		copy($path, 'pukistatic/' . IMAGE_DIR . $dir . $filename);
 	}
 	file_put_contents('index.php', $indexphp);
-	return array('msg' => "生成しました", 'body' => "全ページを静的化しました。<br />ページを閉じないでください。<br /><br /><a href='./pukistatic/'>生成されたURL</a>");
+	
+	return array('msg' => "生成しました", 'body' => "全ページを静的化しました。<br /><br /><a href='./pukistatic/'>生成されたURL</a>");
 }
 
 function pukistatic_glob($dir, $allow_ext) {
