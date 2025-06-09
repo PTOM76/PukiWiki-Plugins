@@ -26,10 +26,10 @@
     <body>
         <div style="padding-left:30%;padding-right:30%;">
 <?php
-	$tooltitle = "PukiWiki Installer v1.1";
-    if(empty($_POST['v_adminpass']) && isset($_POST['install'])){
+	$tooltitle = "PukiWiki Installer v1.2";
+    if(empty($_POST['v_adminpass']) && isset($_POST['install'])) {
         echo "エラー: パスワードが設定されていません。";
-    }elseif(isset($_POST['install'])){
+    } elseif (isset($_POST['install'])){
         $url = $_POST['pkwk_url'];
         $basename = basename($url);
         $fp = fopen($url, "r");
@@ -43,7 +43,7 @@
             }
             fclose($fp);
         }
-        if(file_exists("./" . $basename)){
+        if (file_exists("./" . $basename)) {
             $zip = new ZipArchive;
             $dirname = $basename;
             if ($zip->open("./" . $dirname) === TRUE) {
@@ -60,12 +60,12 @@
                     $dirname = trim($zip->getNameIndex(0), '/');
                 $zip->extractTo('./');
                 $zip->close();
-                if(!dir_copy(pathinfo($dirname)['filename'], __DIR__)){echo 'エラー: ディレクトリのコピーに失敗しました。もう一度試してみてください。';exit;}
-                if(!remove_dir(pathinfo($dirname)['filename'])) {echo "エラー: 解凍後のディレクトリが消えていない可能性があります。手動で削除してください。";}
-                if($_POST['del_tempzip'] = 'on'){
+                if (!dir_copy(pathinfo($dirname)['filename'], __DIR__)) {echo 'エラー: ディレクトリのコピーに失敗しました。もう一度試してみてください。';exit;}
+                if (!remove_dir(pathinfo($dirname)['filename'])) {echo "エラー: 解凍後のディレクトリが消えていない可能性があります。手動で削除してください。";}
+                if ($_POST['del_tempzip'] = 'on') {
                     unlink("./" . $basename);
                 }
-                if($_POST['del_this'] = 'on'){
+                if ($_POST['del_this'] = 'on') {
                     unlink(__FILE__);
                 }
                 pkwk_ini_replace();
@@ -95,8 +95,7 @@
                     }
                     if (is_dir($dir_name . "/" . $file)) {
                         dir_copy($dir_name . "/" . $file, $new_dir . "/" . $file);
-                    }
-                    else {
+                    } else {
                         copy($dir_name . "/" . $file, $new_dir . "/" . $file);
                     }
                 }
@@ -129,7 +128,7 @@
 ?>
 
             <h2><?php echo $tooltitle; ?></h2>
-            <p><a href="https://pukiwiki.osdn.jp/">PukiWiki</a>のインストーラーです。</p>
+            <p><a href="https://pukiwiki.sourceforge.io/">PukiWiki</a>のインストーラーです。</p>
             <p>※PukiWikiは、pukiwiki_installer.phpが設置されているところと同じ場所にインストールされます。</p>
             <form method="post">
                 <h3>設定</h3>
@@ -146,8 +145,8 @@
                 PukiWiki Installerを削除する: <input type="checkbox" name="del_this" value="" checked />
                 <h3>インストール</h3>
                 バージョン: <select name="pkwk_url" size="1">
-                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/77082/pukiwiki-1.5.4_utf8.zip" selected>1.5.4</option>
-                    <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/72656/pukiwiki-1.5.3_utf8.zip">1.5.3</option>
+                    <option value="https://jaist.dl.sourceforge.net/project/pukiwiki/1.5.4/pukiwiki-1.5.4_utf8.zip" selected>1.5.4</option>
+                    <option value="https://jaist.dl.sourceforge.net/project/pukiwiki/1.5.3/pukiwiki-1.5.3_utf8.zip">1.5.3</option>
                     <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/69652/pukiwiki-1.5.2_utf8.zip">1.5.2</option>
                     <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/64807/pukiwiki-1.5.1_utf8.zip">1.5.1</option>
                     <option value="https://ftp.iij.ad.jp/pub/osdn.jp/pukiwiki/61634/pukiwiki-1_5_0_utf8.zip">1.5.0</option>
